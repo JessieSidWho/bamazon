@@ -38,7 +38,8 @@ var start = function(){
 
 var askToBuy = function(){
     inquirer
-    .prompt({
+    .prompt([
+    {
       name: "buy",
       type: "input",
       message: "What is the Item-ID of the product you'd like to buy: ",
@@ -48,7 +49,20 @@ var askToBuy = function(){
         }
         return false;
       }
-  }).then(function(response){
+    },
+    {
+      name: "quantity",
+      type: "input",
+      message: "How many would you like to purchase?",
+      validate: function(value) {
+        if (isNaN(value) === false) {
+          return true;
+        }
+        return false;
+      }
+    }]).then(function(response){
+    var query = "SELECT response.buy FROM"
+
   
       
   });

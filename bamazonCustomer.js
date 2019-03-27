@@ -19,51 +19,80 @@ connection.connect(function(err) {
   start();
 });
 
+// Intial Start Function
+function start() {
+  connection.query('SELECT * FROM Products', function(err, res){
 
-var start = function(){
-    var query = "SELECT item_id, product_name, price FROM products";
-    connection.query(query, function(err, res) {
-    //   console.log(res);
-        for(i = 0; i < res.length; i++){
-            var response = res[i];
-            console.log(`
-                Item-ID: ${response.item_id}  ||  Product: ${response.product_name}  ||  Price: $${response.price}
-            `)
-        }
-        connection.end();
-        askToBuy();
-    });
+      for (var i = 0; i < res.length; i++) {
+          console.log('Item: ' + res[i].product_name + ' | Price: ' + res[i].price + ' | Stock: ' + res[i].stock_quantity);
+      }
+      
+      inquirer.prompt([{
+          name: "choice",
+          type: "rawlist",
+          message: "What would you like to buy?",
+          choices: function(value) {
+              var choiceArray = [];
+              for (var i = 0; i < res.length; i++) {
+                  choiceArray.push(res[i].product_name);
+              }
+              return choiceArray;
+          }
+      }, {
+
+          name: "quantity",
+          type: "input",
+          message: "How many would you like to buy?",
+          validate: function(value) {
+              if (isNaN(value) == false) {
+                  return true;
+              } else {
+                  return false;
+              }
+          }
+      }]).then(function(response) {
+          for (var i = 0; i < res.length; i++) {
+              if (res[i].product_name == response.choice) {
+                  var chosenItem = res[i];
+              }
+          }
+
+          var updateStock = parseInt(chosenItem.stock_quantity) - parseInt(response.quantity);
+
+          if (chosenItem.stock_quantity < parseInt(response.quantity)) {
+              console.log("Insufficient quantity!");
+
+              repurchase();
+          } else {
+              connection.query("UPDATE products SET ? WHERE ?", [{stock_quantity: updateStock}, {item_id: chosenItem.item_id}], function(err, res) {
+                  console.log("Purchase successful!");
+
+                  var Total = (parseInt(response.quantity)*chosenItem.price).toFixed(2);
+                  console.log("Your total is $" + Total);
+
+                  repurchase();
+              });
+          }
+
+      }); 
+                       
+  }); 
+  
 }
 
-
-var askToBuy = function(){
-    inquirer
-    .prompt([
-    {
-      name: "buy",
-      type: "input",
-      message: "What is the Item-ID of the product you'd like to buy: ",
-      validate: function(value) {
-        if (isNaN(value) === false) {
-          return true;
-        }
-        return false;
+// Repurchase Function
+function repurchase() {
+  inquirer.prompt({
+      name: "repurchase",
+      type: "list",
+      choices: ["Yes", "No"],
+      message: "Would you like to purchase another item?"
+  }).then(function(response) {
+      if (response.repurchase == "Yes") {
+          start();
       }
-    },
-    {
-      name: "quantity",
-      type: "input",
-      message: "How many would you like to purchase?",
-      validate: function(value) {
-        if (isNaN(value) === false) {
-          return true;
-        }
-        return false;
+      else {
+          console.log("Thanks for choosing Baller-Boy Motors! Have an awesome day!")
       }
-    }]).then(function(response){
-    var query = "SELECT response.buy FROM"
-
-  
-      
   });
 }

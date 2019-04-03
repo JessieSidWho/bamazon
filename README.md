@@ -3,7 +3,7 @@ MYSQL  |  NODE.JS
 
 Bamazon (demo-video):<br>
 https://drive.google.com/open?id=1nn5fcojsdYpkPXWzOSPkqs3mMHs4sKjw <br>
-<br><br>
+<br>
 Bamazon is a storefront on the CLI. It displays the products that are in stock and how much are in stock. 
 <br><br>
 The program will first ask you to choose the product you are interested in buying.<br><br>

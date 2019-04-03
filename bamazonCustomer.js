@@ -1,5 +1,6 @@
 var mysql = require("mysql");
 var inquirer = require("inquirer");
+const cTable = require('console.table');
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -23,9 +24,20 @@ connection.connect(function(err) {
 function start() {
   connection.query('SELECT * FROM Products', function(err, res){
 
-      for (var i = 0; i < res.length; i++) {
-          console.log('Item: ' + res[i].product_name + ' | Price: ' + res[i].price + ' | Stock: ' + res[i].stock_quantity);
-      }
+      for (var i in res) {
+          console.log(`| Item: ${res[i].product_name}  
+| Price: ${res[i].price} 
+| Stock: ${res[i].stock_quantity}
+           `);
+        // const table = cTable.getTable([
+        //       {
+        //           Item: res[i].product_name,
+        //           Price: res[i].price,
+        //           Stock: res[i].stock_quantity
+        //       }
+        //   ])
+        //   console.log(table);
+       }
       
       inquirer.prompt([{
           name: "choice",
